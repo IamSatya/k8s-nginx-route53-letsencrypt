@@ -1,0 +1,4 @@
+apiVersion: v2
+name: nginx-operator
+description: A Helm chart for deploying the NGINX Operator with NodePort support
+version: 0.2.0
