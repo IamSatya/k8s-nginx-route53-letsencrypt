@@ -8,11 +8,11 @@
             │ Port Forward: 80, 443    │
             └────────┬─────────────────┘
                      ↓
-        ┌───────────────────────────────┐
-        │ NGINX Reverse Proxy (Internal VM) │
-        │ - Listens on 80, 443          │
-        │ - Forwards to K8s Services    │
-        └────────┬──────────────────────┘
+        ┌──────────────────────────────────┐
+        │NGINX Reverse Proxy (Internal VM) │
+        │ - Listens on 80, 443             │
+        │ - Forwards to K8s Services       │
+        └────────────┬─────────────────────┘
                  ↓
         ┌───────────────────────────────┐
         │ Kubernetes Cluster (Internal) │
