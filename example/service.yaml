@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-service
+  annotations:
+    nginx-operator/domain: app.example.com
+    nginx-operator/port: "8080"         # target port of the service
+    nginx-operator/tls: "true"          # enables Let's Encrypt cert
+spec:
+  selector:
+    app: my-app
+  ports:
+    - port: 80
+      targetPort: 8080
