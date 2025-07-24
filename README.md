@@ -1,3 +1,16 @@
+#FLOW OF THE REQUEST
+
+[ Internet ]
+     ↓
+[ Firewall w/ Public IP ]
+     ↓ (Port Forward 80/443)
+[ NGINX Reverse Proxy VM ]
+     ↓ (Proxy rules)
+[ Kubernetes Cluster (internal) ]
+     └── Service A (ClusterIP/NodePort)
+     └── Service B ...
+
+
 # NGINX TLS Operator
 
 This operator watches for Kubernetes Services and:
