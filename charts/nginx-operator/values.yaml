@@ -1,0 +1,16 @@
+replicaCount: 1
+image:
+  repository: nginx-operator
+  tag: latest
+  pullPolicy: IfNotPresent
+nginx:
+  host: 192.168.1.10
+  user: nginxadmin
+  sshKeyPath: /app/.ssh/id_rsa
+  sitesAvailable: /etc/nginx/sites-available
+  sitesEnabled: /etc/nginx/sites-enabled
+certbot:
+  email: admin@yourdomain.com
+aws:
+  hostedZoneId: ZXXXXXXXXXXXXX
+  publicIp: 1.2.3.4

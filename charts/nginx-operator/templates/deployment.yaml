@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-operator
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: nginx-operator
+  template:
+    metadata:
+      labels:
+        app: nginx-operator
+    spec:
+      containers:
+        - name: operator
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: NGINX_HOST
+              value: {{ .Values.nginx.host | quote }}
+            - name: NGINX_USER
+              value: {{ .Values.nginx.user | quote }}
+            - name: NGINX_SSH_KEY
+              value: {{ .Values.nginx.sshKeyPath | quote }}
+            - name: REMOTE_SITES_AVAILABLE
+              value: {{ .Values.nginx.sitesAvailable | quote }}
+            - name: REMOTE_SITES_ENABLED
+              value: {{ .Values.nginx.sitesEnabled | quote }}
+            - name: CERTBOT_EMAIL
+              value: {{ .Values.certbot.email | quote }}
+            - name: HOSTED_ZONE_ID
+              value: {{ .Values.aws.hostedZoneId | quote }}
+            - name: PUBLIC_IP
+              value: {{ .Values.aws.publicIp | quote }}
+          volumeMounts:
+            - name: ssh-key
+              mountPath: /app/.ssh
+              readOnly: true
+      volumes:
+        - name: ssh-key
+          secret:
+            secretName: nginx-ssh-key
