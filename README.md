@@ -1,14 +1,26 @@
-#FLOW OF THE REQUEST
-
-[ Internet ]
-     ↓
-[ Firewall w/ Public IP ]
-     ↓ (Port Forward 80/443)
-[ NGINX Reverse Proxy VM ]
-     ↓ (Proxy rules)
-[ Kubernetes Cluster (internal) ]
-     └── Service A (ClusterIP/NodePort)
-     └── Service B ...
+# FLOW OF THE REQUEST
+                ┌────────────────────┐
+                │     Internet       │
+                └────────┬───────────┘
+                         ↓
+            ┌──────────────────────────┐
+            │ Firewall (Public IP)     │
+            │ Port Forward: 80, 443    │
+            └────────┬─────────────────┘
+                     ↓
+        ┌───────────────────────────────┐
+        │ NGINX Reverse Proxy (Internal VM) │
+        │ - Listens on 80, 443          │
+        │ - Forwards to K8s Services    │
+        └────────┬──────────────────────┘
+                 ↓
+        ┌───────────────────────────────┐
+        │ Kubernetes Cluster (Internal) │
+        │ ┌───────────────────────────┐ │
+        │ │  Service A (NodePort)     │ │
+        │ │  Service B (ClusterIP)    │ │
+        │ └───────────────────────────┘ │
+        └───────────────────────────────┘
 
 
 # NGINX TLS Operator
