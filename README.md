@@ -1,13 +1,3 @@
-# NGINX Operator with NodePort, TLS, and Route53 Support
-
-This Kubernetes Operator automates:
-- Detection of `Service` objects with a specific annotation (`nginx-operator.io/hostname`)
-- TLS certificate provisioning via Let's Encrypt (using Certbot on a remote NGINX server)
-- Automatic NGINX virtual host generation and reload
-- A-record creation in AWS Route53
-
----
-
 # FLOW OF THE REQUEST
                 ┌────────────────────┐
                 │     Internet       │
@@ -31,6 +21,16 @@ This Kubernetes Operator automates:
         │ │  Service B (ClusterIP)    │ │
         │ └───────────────────────────┘ │
         └───────────────────────────────┘
+
+# NGINX Operator with NodePort, TLS, and Route53 Support
+
+This Kubernetes Operator automates:
+- Detection of `Service` objects with a specific annotation (`nginx-operator.io/hostname`)
+- TLS certificate provisioning via Let's Encrypt (using Certbot on a remote NGINX server)
+- Automatic NGINX virtual host generation and reload
+- A-record creation in AWS Route53
+
+---
 
 ## 🧰 Prerequisites
 
@@ -126,6 +126,60 @@ The operator will:
 - Request a TLS cert using Certbot
 - Reload NGINX
 - Register an A-record in Route53
+
+---
+
+## 🔐 Let's Encrypt Certificate Generation (via Certbot)
+
+The operator SSHs into the NGINX server and runs the following steps:
+
+### 1. Check for existing cert:
+```bash
+sudo certbot certificates --domain app.example.com
+```
+
+### 2. If not found, generate using Certbot:
+```bash
+sudo certbot certonly \
+  --nginx \
+  --non-interactive \
+  --agree-tos \
+  --email admin@example.com \
+  -d app.example.com
+```
+
+### 3. Manually reload NGINX:
+```bash
+sudo systemctl reload nginx
+```
+
+### 4. NGINX config sample generated:
+```nginx
+server {
+    listen 443 ssl;
+    server_name app.example.com;
+
+    ssl_certificate /etc/letsencrypt/live/app.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/app.example.com/privkey.pem;
+
+    location / {
+        proxy_pass http://<node-ip>:<node-port>;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+### 5. Auto-renewal setup
+Certbot installs a systemd timer or cron job by default:
+```bash
+sudo certbot renew --quiet
+```
+
+You can verify with:
+```bash
+systemctl list-timers | grep certbot
+```
 
 ---
 
