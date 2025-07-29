@@ -1,34 +1,36 @@
 # Kubernetes NGINX + Route53 + Let's Encrypt Operator
 
-This operator watches Kubernetes services with specific annotations and automatically:
+This Helm chart deploys a Kubernetes operator that watches services with specific annotations and automatically:
 
-- Creates NGINX virtual host configurations on a remote NGINX server (192.168.1.10)
-- Issues TLS certificates using Let's Encrypt
-- Creates corresponding A records in AWS Route53
-
----
-
-## 🛠 Prerequisites
-
-- Kubernetes cluster (on-prem or cloud)
-- NGINX server accessible via SSH (e.g., 192.168.1.10)
-- AWS IAM user with Route53 permissions
-- Helm installed
+- Creates NGINX virtual host configurations on a remote NGINX server (e.g. 192.168.1.10)
+- Issues Let's Encrypt TLS certificates
+- Creates A records in AWS Route53
 
 ---
 
-## 🔧 Helm Installation
+## 🐳 Docker Image
 
-### 1. Clone the Repository
+Build the Docker image locally:
 
 ```bash
-git clone https://github.com/IamSatya/k8s-nginx-route53-letsencrypt.git
-cd k8s-nginx-route53-letsencrypt
+docker build -t nginx-operator:latest .
 ```
 
-### 2. Create AWS Credentials Secret
+To use in local Kubernetes clusters (e.g., kind):
 
-Create a file named `aws-credentials` with your AWS credentials:
+```bash
+kind load docker-image nginx-operator:latest
+```
+
+If hosting on a public or private registry, push the image accordingly and update the Helm `values.yaml` to use it.
+
+---
+
+## 🔐 AWS Credentials Setup
+
+Create a Kubernetes secret that includes your AWS credentials:
+
+1. Create an AWS credentials file named `aws-credentials`:
 
 ```ini
 [default]
@@ -37,7 +39,7 @@ aws_secret_access_key = YOUR_SECRET_KEY
 region = YOUR_REGION
 ```
 
-Then create a Kubernetes secret:
+2. Create the secret in Kubernetes:
 
 ```bash
 kubectl create secret generic aws-credentials \
@@ -45,106 +47,17 @@ kubectl create secret generic aws-credentials \
   --namespace=default
 ```
 
-### 3. Add SSH Key Secret (for remote NGINX access)
-
-```bash
-kubectl create secret generic nginx-ssh-key \
-  --from-file=id_rsa=/path/to/your/private_key \
-  --namespace=default
-```
-
-### 4. Update `values.yaml`
-
-Edit these values in `values.yaml`:
+3. Reference this secret in your Helm `values.yaml`:
 
 ```yaml
 aws:
   credentialsSecret: aws-credentials
   hostedZoneId: YOUR_HOSTED_ZONE_ID
   region: YOUR_REGION
-
-nginx:
-  host: 192.168.1.10
-  user: ubuntu
-  sshKeySecret: nginx-ssh-key
-
-certbot:
-  email: your-email@example.com
-```
-
-### 5. Install via Helm
-
-```bash
-helm install nginx-operator ./chart
 ```
 
 ---
 
-## 📝 Service Annotation Example
+For full usage instructions, see the repository documentation or values.yaml examples.
 
-Add annotations to your Kubernetes service like this:
-
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: example-app
-  annotations:
-    nginx-operator/enabled: "true"
-    nginx-operator/hostname: "app.example.com"
-    nginx-operator/cert-type: "letsencrypt"
-spec:
-  type: NodePort
-  ports:
-    - port: 80
-      targetPort: 8080
-  selector:
-    app: example
-```
-
----
-
-## 🔁 Auto-Renew & Cleanup
-
-- Let's Encrypt certificates are auto-renewed using `certbot renew` via a background cron job.
-- Removed services are automatically cleaned from NGINX and Route53.
-
----
-
-## 🐳 Docker Image
-
-To build the image:
-
-```bash
-docker build -t nginx-operator:latest .
-```
-
-For local cluster testing:
-
-```bash
-kind load docker-image nginx-operator:latest
-```
-
----
-
-## 📂 File Structure
-
-```
-k8s-nginx-route53-letsencrypt/
-├── chart/                   # Helm chart
-├── nginx_operator/         # Operator source code
-│   ├── __init__.py
-│   ├── watcher.py
-│   ├── certbot.py
-│   └── dns.py
-├── Dockerfile
-├── values.yaml             # Helm values file
-├── requirements.txt
-└── README.md
-```
-
----
-
-## 📬 Contact
-
-Maintained by [IamSatya](https://github.com/IamSatya). Contributions welcome!
+Maintained by [IamSatya](https://github.com/IamSatya).
