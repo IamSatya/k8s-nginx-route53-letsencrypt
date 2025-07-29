@@ -1,0 +1,4 @@
+apiVersion: v2
+name: nginx-operator
+version: 0.1.0
+description: NGINX Operator for Kubernetes services with Route53 + Let's Encrypt

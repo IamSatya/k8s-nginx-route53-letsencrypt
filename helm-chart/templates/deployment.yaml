@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-operator
+  template:
+    metadata:
+      labels:
+        app: nginx-operator
+    spec:
+      containers:
+        - name: operator
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: AWS_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.aws.credentialsSecret }}
+                  key: region
+          volumeMounts:
+            - name: ssh-key
+              mountPath: /root/.ssh
+              readOnly: true
+      volumes:
+        - name: ssh-key
+          secret:
+            secretName: {{ .Values.ssh.privateKeySecret }}

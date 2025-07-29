@@ -1,0 +1,14 @@
+image:
+  repository: nginx-operator
+  tag: latest
+  pullPolicy: IfNotPresent
+
+aws:
+  credentialsSecret: aws-credentials
+  region: us-east-1
+  hostedZoneId: ZONEIDHERE
+
+ssh:
+  privateKeySecret: nginx-ssh-key
+  user: ubuntu
+  host: 192.168.1.10
