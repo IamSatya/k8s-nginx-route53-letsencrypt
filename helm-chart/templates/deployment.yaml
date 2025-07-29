@@ -13,20 +13,27 @@ spec:
         app: nginx-operator
     spec:
       containers:
-        - name: operator
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:
-            - name: AWS_REGION
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.aws.credentialsSecret }}
-                  key: region
-          volumeMounts:
-            - name: ssh-key
-              mountPath: /root/.ssh
-              readOnly: true
-      volumes:
+      - name: operator
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: AWS_REGION
+          value: "{{ .Values.aws.region }}"
+        - name: HOSTED_ZONE_ID
+          value: "{{ .Values.aws.hostedZoneId }}"
+        - name: NGINX_HOST
+          value: "{{ .Values.nginx.host }}"
+        - name: NGINX_USER
+          value: "{{ .Values.nginx.user }}"
+        - name: NGINX_PUBLIC_IP
+          value: "{{ .Values.nginx.publicIp }}"
+        - name: NGINX_SSH_KEY_PATH
+          value: "/etc/ssh-key/nginx.key"
+        volumeMounts:
         - name: ssh-key
-          secret:
-            secretName: {{ .Values.ssh.privateKeySecret }}
+          mountPath: /etc/ssh-key
+          readOnly: true
+      volumes:
+      - name: ssh-key
+        secret:
+          secretName: {{ .Values.nginx.sshKeySecret }}
