@@ -1,0 +1,5 @@
+kopf
+kubernetes
+boto3
+requests
+python-dotenv
