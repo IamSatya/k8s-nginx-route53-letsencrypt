@@ -1,4 +1,5 @@
 apiVersion: v2
 name: nginx-operator
+description: Operator to automate NGINX virtual hosts + Route53 + Let's Encrypt
 version: 0.1.0
-description: NGINX Operator for Kubernetes services with Route53 + Let's Encrypt
+appVersion: "1.0"
