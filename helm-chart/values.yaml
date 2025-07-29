@@ -1,14 +1,14 @@
 image:
-  repository: nginx-operator
+  repository: your-dockerhub/nginx-operator
   tag: latest
   pullPolicy: IfNotPresent
 
 aws:
-  credentialsSecret: aws-credentials
   region: us-east-1
-  hostedZoneId: ZONEIDHERE
+  hostedZoneId: Z1234567890ABCDEFG
 
-ssh:
-  privateKeySecret: nginx-ssh-key
-  user: ubuntu
+nginx:
   host: 192.168.1.10
+  user: ubuntu
+  sshKeySecret: nginx-ssh-key
+  publicIp: 203.0.113.10
