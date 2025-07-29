@@ -1,0 +1,15 @@
+aws:
+  accessKeyId: YOUR_ACCESS_KEY
+  secretAccessKey: YOUR_SECRET_KEY
+  region: us-east-1
+  hostedZoneId: ZXXXXXXXXXXXXX
+
+nginx:
+  ssh:
+    host: 192.168.1.10
+    user: ubuntu
+    privateKeyPath: /root/.ssh/nginx_server_key
+
+certbot:
+  email: you@example.com
+  useStaging: false
