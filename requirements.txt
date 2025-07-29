@@ -1,4 +1,4 @@
 kubernetes
 boto3
-python-dotenv
-requests
+paramiko
+certbot
